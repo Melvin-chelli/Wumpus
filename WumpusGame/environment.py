@@ -13,7 +13,8 @@ class Environment(object):
         self.coordinate = {
             "pit":[],
             "wumpus":[],
-            "gold":[]
+            "gold":[],
+            "stench":[]
         }
         valid_environment = False
         while(not valid_environment):
@@ -111,11 +112,18 @@ class Environment(object):
     
     def getPerceptions(self, coordinate:tuple)->list:
         perceptions = []
-        if self.isPerception(coordinate, 'breeze'): perceptions.append('breeze')
-        if self.isPerception(coordinate, 'stench'): perceptions.append('stench')
-        if self.isPerception(coordinate, 'glitter'): perceptions.append('glitter')
+        if self.isPerception(coordinate, 'breeze'):
+            perceptions.append('breeze')
+            # print('Breeze here')
+        if self.isPerception(coordinate, 'stench'):
+            perceptions.append('stench')
+            # print('stench here')
+        if self.isPerception(coordinate, 'glitter'):
+            perceptions.append('glitter')
+            # print('glitter here')
         if self.screamTrigger: 
             perceptions.append('scream')
+            # print('scream here')
             self.screamTrigger = False         
         return perceptions
 

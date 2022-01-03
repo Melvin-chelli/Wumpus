@@ -1,5 +1,7 @@
 import pygame
 import os
+from WumpusGame import player
+from WumpusGame.player import Player
 
 WHITE = (200,200,200)
 BACKGROUND = (155,155,155)
@@ -23,10 +25,15 @@ class Screen(object):
         self.img_gold = None
         self.img_agent = None
         self.img_status_agent = None
+        self.img_stench = None
+        self.img_breeze = None
         self.agents = []
         self.generation = None
         self.clock = pygame.time.Clock()
         self.fps = 240
+        self.breeze_coord = []
+        self.stench_coord = []
+        self.glitter_coord = []
 
     def show(self, dimension):
         pygame.init()
@@ -41,11 +48,11 @@ class Screen(object):
         self.parts = dimension
         self.part = self.square_size//self.parts
         self.loadComponets()
-        
-    
+
+
     def loadComponets(self,):
         self.img_wumpus = [
-            pygame.image.load(os.path.abspath('img/monster.png')), 
+            pygame.image.load(os.path.abspath('img/monster.png')),
             pygame.image.load(os.path.abspath('img/monster.png'))
         ]
 
@@ -66,48 +73,62 @@ class Screen(object):
         self.img_agent = [
             pygame.image.load(os.path.abspath('img/man.png')),
         ]
-        
+
+        self.img_stench = [
+            pygame.image.load(os.path.abspath('img/stench.png')),
+        ]
+
+        self.img_breeze = [
+            pygame.image.load(os.path.abspath('img/breeze.png')),
+        ]
+
         self.img_agent = [pygame.transform.scale(img, (self.part-1,self.part-1)) for img in self.img_agent]
 
         self.img_status_agent ={
-            "success":pygame.image.load(os.path.abspath('img/success.png')), 
+            "success":pygame.image.load(os.path.abspath('img/success.png')),
             "died": pygame.image.load(os.path.abspath('img/gravestone.png')),
             "got_gold": pygame.image.load(os.path.abspath('img/robber.png')),
-            "killed_wumpus":pygame.image.load(os.path.abspath('img/superhero.png'))
+            "killed_wumpus":pygame.image.load(os.path.abspath('img/superhero.png')),
+            "stench": pygame.image.load(os.path.abspath('img/stench.png')),
+            "breeze": pygame.image.load(os.path.abspath('img/breeze.png')),
+            "glitter": pygame.image.load(os.path.abspath('img/glitter.png'))
          }
-        
+
         self.img_status_agent = {
-            "success":pygame.transform.scale(self.img_status_agent["success"], (self.part-1,self.part-1)), 
+            "success":pygame.transform.scale(self.img_status_agent["success"], (self.part-1,self.part-1)),
             "died": pygame.transform.scale(self.img_status_agent["died"], (self.part-1,self.part-1)),
             "got_gold": pygame.transform.scale(self.img_status_agent["got_gold"], (self.part-1,self.part-1)),
             "killed_wumpus":pygame.transform.scale(self.img_status_agent["killed_wumpus"], (self.part-1,self.part-1)),
+            "stench": pygame.transform.scale(self.img_status_agent["stench"], (self.part - 1, self.part - 1)),
+            "breeze": pygame.transform.scale(self.img_status_agent["breeze"], (self.part - 1, self.part - 1)),
+            "glitter": pygame.transform.scale(self.img_status_agent["glitter"], (self.part - 1, self.part - 1))
         }
     def addAgents(self, agents: list):
         self.agents = agents
-        
-    
+
+
     def addWumpus(self, coordinates: list):
         self.wumpus_coordinates = [ self.getPositionElement(x, y) for x, y in coordinates ]
-        
+
     def addPits(self, coordinates: list):
         #print(coordinates)
         self.pits_coordinates = [ self.getPositionElement(x, y) for x, y in coordinates ]
         #print(self.pits_coordinates)
     def addGold(self, coordinates: list):
         self.gold_coordinates = [ self.getPositionElement(x, y) for x, y in coordinates ]
-    
+
     def getPositionElement(self, y, x) ->tuple:
         return self.initial_x + (self.part * x), self.square_y - (self.part * y) - self.part
-    
+
     def moveAgent(self, ):
         pass
-    
+
     def updateComponents(self, ):
         self.screen.fill(BACKGROUND)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:   quit()
         # self.printInfo()
-        
+
         pygame.draw.line(self.screen, WHITE, (self.initial_x, self.initial_y), (self.initial_x , self.square_y), 2)
         pygame.draw.line(self.screen, WHITE, (self.initial_x, self.initial_y), (self.square_x, self.initial_y), 2)
 
@@ -117,15 +138,27 @@ class Screen(object):
         for i in range(self.parts):
             pygame.draw.line(self.screen, WHITE, (self.initial_x  + (self.part * (i+1)), self.initial_y),  (self.initial_x  + (self.part * (i+1)), self.square_y), 2)
 
-        for coordinate in self.wumpus_coordinates:
-            self.screen.blit(self.img_wumpus[0], coordinate)
-        
-        for coordinate in self.gold_coordinates:
-            self.screen.blit(self.img_gold[0], coordinate)
+        #for coordinate in self.wumpus_coordinates:
+        #    self.screen.blit(self.img_wumpus[0], coordinate)
 
-        for coordinate in self.pits_coordinates:
-            self.screen.blit(self.img_pit[0], coordinate)
-        
+        #for coordinate in self.gold_coordinates:
+        #    self.screen.blit(self.img_gold[0], coordinate)
+
+        #for coordinate in self.pits_coordinates:
+        #    self.screen.blit(self.img_pit[0], coordinate)
+
+        for coordinate in self.breeze_coord:
+            if self.breeze_coord:
+                self.screen.blit(self.img_status_agent["breeze"], self.getPositionElement(*coordinate))
+
+        for coordinate in self.stench_coord:
+            if self.breeze_coord:
+                self.screen.blit(self.img_status_agent["stench"], self.getPositionElement(*coordinate))
+
+        for coordinate in self.glitter_coord:
+            if self.breeze_coord:
+                self.screen.blit(self.img_status_agent["glitter"], self.getPositionElement(*coordinate))
+
         agent = self.agents
         if agent.agent_died:
             self.screen.blit(self.img_status_agent["died"], self.getPositionElement(*agent.coordinate))
@@ -136,23 +169,44 @@ class Screen(object):
         elif agent.hasGold():
             self.screen.blit(self.img_status_agent["got_gold"], self.getPositionElement(*agent.coordinate))
         else:
-            self.screen.blit(self.img_agent[0], self.getPositionElement(*agent.coordinate));
+            self.screen.blit(self.img_agent[0], self.getPositionElement(*agent.coordinate))
+
+        if agent.feelBreeze():
+            if not agent.coordinate in self.breeze_coord:
+                self.breeze_coord.append(agent.coordinate)
+                #print(self.breeze_coord)
+
+        if agent.feelStench():
+            if not agent.coordinate in self.stench_coord:
+                self.stench_coord.append(agent.coordinate)
+
+
+        if agent.feelGlitter():
+            if not agent.coordinate in self.glitter_coord:
+                self.glitter_coord.append(agent.coordinate)
+
+
+
         pygame.display.update()
 
         if self.generation == 'x':
             self.fps = 2
         self.clock.tick(self.fps)
 
-    # def updatePerceptions(self,):
-    #     agent = self.agents
+
+    # def updatePerceptions(self, player: Player):
+    #     agent = player
     #     x,y = agent.coordinate
     #     left = x, y-1
     #     right = x, y+1
     #     up = x+1, y
     #     down = x-1, y
     #
-    #     if left in self.pits_coordinates:
-    #         print("Pit to left")
+    #     for coordinate in self.pits_coordinates:
+    #         print(self.pits_coordinates)
+    #         if left == coordinate:
+    #             print("Pit to left")
+
 
 
     #

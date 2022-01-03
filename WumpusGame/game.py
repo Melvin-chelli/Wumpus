@@ -49,6 +49,10 @@ class Game(object):
                         self.agent.escape()
                         print('agent wins')
                         continue
+                    # self.screen.updatePerceptions(self.agent)
+                    perceptions = self.environment.getPerceptions(coordinate)
+                    self.agent.hasPerception(perceptions)
+
 
                 if agent_action.name == 'shoot':
                     if not self.agent.hasArrow():
@@ -71,15 +75,17 @@ class Game(object):
 
                             # print('agent took gold')
                 sleep(0.3)
-        sleep(5)
+        sleep(2)
         print("Game Over")
+
+
 
     def targetCoordinate(self, coordinate:tuple, direction:str) -> tuple:
         x,y = coordinate
-        if   direction == 'N': return (x+1,y)
-        elif direction == 'S': return (x-1,y)
-        elif direction == 'L': return (x,y+1)
-        elif direction == 'O': return (x,y-1)
+        if   direction == 'U': return (x+1,y)
+        elif direction == 'D': return (x-1,y)
+        elif direction == 'R': return (x,y+1)
+        elif direction == 'L': return (x,y-1)
     
 
         

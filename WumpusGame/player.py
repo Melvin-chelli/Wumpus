@@ -1,7 +1,6 @@
 import pygame
 
 from .action import Action, table_of_actions
-from .gui.screen import Screen
 from random import choice
 
 
@@ -11,6 +10,9 @@ class Player(object):
         self.coordinate = (0, 0)
         self.arrow = True
         self.gold = False
+        self.breeze = False
+        self.stench = False
+        self.glitter = False
         self.size = size
         self.initParams()
 
@@ -39,15 +41,14 @@ class Player(object):
     def move(self, direction: str):
         x, y = self.coordinate
 
-        if direction == 'N':
+        if direction == 'U':
             self.coordinate = (x + 1, y)
-        elif direction == 'S':
+        elif direction == 'D':
             self.coordinate = (x - 1, y)
-        elif direction == 'L':
+        elif direction == 'R':
             self.coordinate = (x, y + 1)
-        elif direction == 'O':
+        elif direction == 'L':
             self.coordinate = (x, y - 1)
-        # Screen.updatePerceptions(self)
         #print(self.coordinate)
 
     def shoot(self, ):
@@ -56,8 +57,33 @@ class Player(object):
     def pickUp(self, ):
         self.got_gold = True
 
+    def hasPerception(self, perceptions):
+        #(perceptions)
+        if 'breeze' in perceptions:
+            self.breeze = True
+        else:
+            self.breeze = False
+        if 'stench' in perceptions:
+            self.stench = True
+        else:
+            self.stench = False
+        if 'glitter' in perceptions:
+            self.glitter = True
+        else:
+            self.glitter = False
+
+
     def hasGold(self, ) -> bool:
         return self.got_gold
+
+    def feelBreeze(self, )-> bool:
+        return self.breeze
+
+    def feelStench(self, )-> bool:
+        return self.stench
+
+    def feelGlitter(self, )-> bool:
+        return self.glitter
 
     def hasArrow(self, ) -> bool:
         return self.arrow
